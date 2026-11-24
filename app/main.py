@@ -66,6 +66,18 @@ def saude():
     # Devolve um status fixo
     return {"status": "ok"}
 
+# Descobre o endereço do visitante; na Vercel o endereço real vem em cabeçalhos do proxy
+def descobrir_visitante(requisicao: Request) -> str:
+    # A Vercel define a variável VERCEL no ambiente; localmente ela não existe
+    if os.getenv("VERCEL"):
+        # O cabeçalho x-forwarded-for traz uma lista de endereços; o primeiro é o do visitante
+        encaminhado = requisicao.headers.get("x-forwarded-for", "")
+        # Se houver valor, devolve o primeiro endereço, sem espaços
+        if encaminhado:
+            return encaminhado.split(",")[0].strip()
+    # Fora da Vercel, ou sem o cabeçalho, usa o endereço da conexão
+    return requisicao.client.host if requisicao.client else "desconhecido"
+
 
 # Rota principal: recebe uma mensagem (POST) e devolve a análise
 @app.post("/analisar", response_model=Resultado)
@@ -75,8 +87,8 @@ def analisar_mensagem(mensagem: Mensagem, requisicao: Request):
         # Erro 422: dado inválido enviado pelo usuário
         raise HTTPException(status_code=422, detail="A mensagem não pode estar em branco.")
 
-    # Identifica o visitante pelo endereço de rede; usa "desconhecido" se não houver
-    visitante = requisicao.client.host if requisicao.client else "desconhecido"
+    # Identifica o visitante usando a função descobrir_visitante
+    visitante = descobrir_visitante(requisicao)
     # Se este visitante já passou do limite por minuto, recusa
     if not limite_por_visitante.permitir(visitante):
         # Erro 429: muitas requisições; Retry-After diz quantos segundos esperar

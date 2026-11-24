@@ -2,7 +2,7 @@
 from fastapi.testclient import TestClient
 
 # Importa a aplicação que vamos testar
-from app.api import app
+from app.main import app
 
 # No topo do arquivo, junto dos outros imports:
 from app.limitador import LimitadorDeUso
@@ -30,7 +30,7 @@ def test_saude():
 # Testa uma análise com sucesso; monkeypatch troca a função real pela falsa
 def test_analisar_mensagem_valida(monkeypatch):
     # Troca a função analisar usada pela API pela versão falsa
-    monkeypatch.setattr("app.api.analisar", analise_falsa)
+    monkeypatch.setattr("app.main.analisar", analise_falsa)
     # Envia uma mensagem de teste
     resposta = cliente.post("/analisar", json={"texto": "Sua conta foi bloqueada, acesse o link agora."})
     # Confere o código de sucesso
@@ -62,7 +62,7 @@ def test_modelo_nao_treinado(monkeypatch):
         # Levanta o mesmo erro que aconteceria sem o modelo treinado
         raise FileNotFoundError()
     # Troca a função analisar por essa versão que falha
-    monkeypatch.setattr("app.api.analisar", sem_modelo)
+    monkeypatch.setattr("app.main.analisar", sem_modelo)
     # Envia uma mensagem válida
     resposta = cliente.post("/analisar", json={"texto": "Sua conta foi bloqueada, acesse o link agora."})
     # Confere que a API respondeu 503 (serviço não pronto)
@@ -71,7 +71,7 @@ def test_modelo_nao_treinado(monkeypatch):
 # Testa que a API devolve 429 quando o visitante passa do limite
 def test_limite_de_uso_devolve_429(monkeypatch):
     # Troca o limitador por um que não permite nenhum uso
-    monkeypatch.setattr("app.api.limite_por_visitante", LimitadorDeUso(maximo=0, janela_segundos=60))
+    monkeypatch.setattr("app.main.limite_por_visitante", LimitadorDeUso(maximo=0, janela_segundos=60))
     # Envia uma mensagem válida
     resposta = cliente.post("/analisar", json={"texto": "Sua conta foi bloqueada, acesse o link agora."})
     # Confere que a API respondeu 429 (muitas requisições)
