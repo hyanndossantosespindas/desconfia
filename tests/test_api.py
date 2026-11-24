@@ -4,6 +4,9 @@ from fastapi.testclient import TestClient
 # Importa a aplicação que vamos testar
 from app.api import app
 
+# No topo do arquivo, junto dos outros imports:
+from app.limitador import LimitadorDeUso
+
 # Cria o cliente de teste ligado à aplicação
 cliente = TestClient(app)
 
@@ -64,3 +67,12 @@ def test_modelo_nao_treinado(monkeypatch):
     resposta = cliente.post("/analisar", json={"texto": "Sua conta foi bloqueada, acesse o link agora."})
     # Confere que a API respondeu 503 (serviço não pronto)
     assert resposta.status_code == 503
+
+# Testa que a API devolve 429 quando o visitante passa do limite
+def test_limite_de_uso_devolve_429(monkeypatch):
+    # Troca o limitador por um que não permite nenhum uso
+    monkeypatch.setattr("app.api.limite_por_visitante", LimitadorDeUso(maximo=0, janela_segundos=60))
+    # Envia uma mensagem válida
+    resposta = cliente.post("/analisar", json={"texto": "Sua conta foi bloqueada, acesse o link agora."})
+    # Confere que a API respondeu 429 (muitas requisições)
+    assert resposta.status_code == 429    

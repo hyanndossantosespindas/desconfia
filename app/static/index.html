@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<!-- lang pt-BR ajuda leitores de tela a pronunciar o texto corretamente -->
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <!-- Faz a página se ajustar bem ao tamanho do celular -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Desconfia</title>
+  <!-- Ícone que aparece na aba do navegador -->
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <!-- Fonte feita para leitura fácil; sem internet, o navegador usa a fonte do sistema -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+  <!-- Liga o arquivo de estilos -->
+  <link rel="stylesheet" href="/static/estilo.css">
+</head>
+<body>
+
+  <!-- Topo: faixa escura com o escudo, o nome e uma frase simples -->
+  <header class="topo">
+    <div class="topo-conteudo">
+      <svg class="logo" viewBox="0 0 48 48" width="56" height="56" aria-hidden="true">
+        <path d="M24 4 8 10v12c0 10 6.8 18.6 16 22 9.2-3.4 16-12 16-22V10L24 4Z" fill="currentColor"/>
+        <path d="m16 24 6 6 11-12" fill="none" stroke="#0c4a4e" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <h1>Desconfia</h1>
+      <p class="subtitulo">Recebeu uma mensagem estranha? Cole aqui e veja se pode ser golpe.</p>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- Cartão de entrada: onde a pessoa cola a mensagem -->
+    <section class="cartao">
+      <label for="texto">Cole aqui a mensagem que você recebeu</label>
+      <textarea id="texto" rows="6" maxlength="2000"
+        placeholder="Exemplo: Sua conta foi bloqueada. Clique no link para desbloquear."></textarea>
+      <p class="contador"><span id="contagem">0</span> de 2000 letras</p>
+            <p class="aviso">🔒 Não cole senhas, CPF, número de cartão ou outros dados pessoais. O texto é enviado ao Google (Gemini) para gerar a explicação.</p>
+
+      <div class="botoes">
+        <button id="verificar" class="primario" type="button">Verificar mensagem</button>
+        <button id="limpar" class="secundario" type="button">Limpar</button>
+      </div>
+
+      <p class="exemplo">
+        Quer ver como funciona?
+        <button id="exemplo" class="link" type="button">Usar uma mensagem de exemplo</button>
+      </p>
+    </section>
+
+    <!-- Mensagem de erro: fica escondida até acontecer algum problema -->
+    <p id="erro" class="erro" role="alert" hidden></p>
+
+    <!-- Cartão de resultado: fica escondido até a análise terminar -->
+    <section id="resultado" class="cartao resultado" tabindex="-1" aria-live="polite" hidden>
+      <h2 id="titulo-resultado"></h2>
+      <p id="explicacao"></p>
+
+      <!-- Medidor visual: a barra se enche conforme o risco -->
+      <div class="medidor" aria-hidden="true"><div id="barra"></div></div>
+      <p id="confianca" class="confianca"></p>
+
+      <h3>O que fazer agora</h3>
+      <ul id="passos"></ul>
+    </section>
+
+  </main>
+
+  <!-- Rodapé com o aviso de que é uma ajuda, e não uma garantia -->
+  <footer class="rodape">
+    <p>Esta análise é uma ajuda e pode errar. Na dúvida, não clique em links e confirme pelo
+    telefone ou aplicativo oficial da empresa.</p>
+    <p>Projeto de estudo com dados fictícios.</p>
+    <p class="autor">Desenvolvido por Hyann ·
+      <a href="https://hyanndev.vercel.app" target="_blank" rel="noopener">hyann.dev</a>
+    </p>
+  </footer>
+
+  <!-- Liga o arquivo com a lógica da página -->
+  <script src="/static/app.js"></script>
+</body>
+</html>
