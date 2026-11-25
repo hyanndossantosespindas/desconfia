@@ -114,3 +114,12 @@ def analisar_mensagem(mensagem: Mensagem, requisicao: Request):
     except FileNotFoundError:
         # Erro 503: serviço ainda não está pronto, com instrução de como corrigir
         raise HTTPException(status_code=503, detail="Modelo não treinado. Rode: python -m app.treinar")
+
+
+@app.get("/diagnostico")  # rota temporária, remover depois
+def diagnostico():
+    return {
+        "chave_configurada": bool(os.getenv("GEMINI_API_KEY")),  # só true/false
+        "modelo": os.getenv("GEMINI_MODEL", "padrao"),           # nome do modelo
+        "na_vercel": bool(os.getenv("VERCEL")),                  # confirma que é o servidor do Vercel
+    }
